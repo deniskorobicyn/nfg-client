@@ -146,6 +146,45 @@ module NFGClient
         response
       end
     end
+
+    # Makes a donation in single transaction
+    #
+    # Arguments:
+    #   params: (Hash)
+    def make_donation(params)
+      requires!(params, :DonationLineItems, :TotalAmount, :TipAmount, :DonorIpAddress, :DonorToken, :DonorFirstName, :DonorLastName, :DonorEmail, :DonorAddress1, :DonorAddress2, :DonorCity, :DonorState, :DonorZip, :DonorCountry, :DonorPhone, :CardType, :NameOnCard, :CardNumber, :ExpMonth, :ExpYear, :CSC)
+      call_params = add_credentials_to_params(params)
+      response = nfg_soap_request('MakeDonation', call_params)
+      if response.is_a? REXML::Element
+        if (response.elements['StatusCode'].get_text.to_s == 'Success') || ((response.elements['StatusCode'].get_text.to_s != 'Success') && response.elements['ErrorDetails'].elements['ErrorInfo'].nil?)
+          {
+            'StatusCode' => response.elements['StatusCode'].get_text.to_s,
+            'Message' => response.elements['Message'].get_text.to_s,
+            'ErrorDetails' => response.elements['ErrorDetails'].get_text.to_s,
+            'CallDuration' => response.elements['CallDuration'].get_text.to_s,
+            'ChargeId' => response.elements['ChargeId'].get_text.to_s,
+            'COFId' => response.elements['CofId'].get_text.to_s
+          }
+        else
+          {
+            'StatusCode' => response.elements['StatusCode'].get_text.to_s,
+            'Message' => response.elements['Message'].get_text.to_s,
+            'ErrorDetails' => {
+              'ErrorInfo' => {
+                'ErrCode' => response.elements['ErrorDetails'].andand.elements.andand['ErrorInfo'].andand.elements.andand['ErrCode'].andand.get_text.andand.to_s,
+                'ErrData' => response.elements['ErrorDetails'].andand.elements.andand['ErrorInfo'].andand.elements.andand['ErrData'].andand.get_text.andand.to_s
+              }
+            },
+            'CallDuration' => response.elements['CallDuration'].get_text.to_s,
+            'ChargeId' => response.elements['ChargeId'].get_text.to_s,
+            'COFId' => response.elements['CofId'].get_text.to_s
+          }
+        end
+      else
+        response
+      end
+    end
+
     # Makes a donation using the given COF
     #
     # Arguments:
