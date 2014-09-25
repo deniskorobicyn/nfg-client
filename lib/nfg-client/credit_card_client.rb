@@ -1,5 +1,5 @@
 module NFGClient
-  class CreditCardClient
+  class CreditCardClient < Base
     @@nfg_urls = {
       'sandbox' => {
         'host' => 'api-sandbox.networkforgood.org',

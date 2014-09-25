@@ -1,5 +1,5 @@
 module NFGClient
-  class PaypalClient
+  class PaypalClient < Base
   	@@nfg_urls = {
       'sandbox' => {
         'host' => 'api-sandbox.networkforgood.org',
