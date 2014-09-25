@@ -61,17 +61,20 @@ module NFGClient
             'CallDuration' => response.elements['CallDuration'].get_text.to_s
           }
         else
-          {
+          response_hash = {
             'StatusCode' => response.elements['StatusCode'].get_text.to_s,
             'Message' => response.elements['Message'].get_text.to_s,
-            'ErrorDetails' => {
-              'ErrorInfo' => {
-                'ErrCode' => response.elements['ErrorDetails'].andand.elements.andand['ErrorInfo'].andand.elements.andand['ErrCode'].andand.get_text.andand.to_s,
-                'ErrData' => response.elements['ErrorDetails'].andand.elements.andand['ErrorInfo'].andand.elements.andand['ErrData'].andand.get_text.andand.to_s
-              }
-            },
             'CallDuration' => response.elements['CallDuration'].get_text.to_s
           }
+          if response.elements['ErrorDetails']
+            response_hash['ErrorDetails'] = {}
+            if response.elements['ErrorDetails/ErrorInfo']
+              response_hash['ErrorInfo'] = {}
+              response_hash['ErrCode'] = response.elements['ErrorDetails/ErrorInfo/ErrCode'].get_text.to_s if response.elements['ErrorDetails/ErrorInfo/ErrCode']
+              response_hash['ErrCode'] = response.elements['ErrorDetails/ErrorInfo/ErrCode'].get_text.to_s if response.elements['ErrorDetails/ErrorInfo/ErrCode']
+            end
+          end
+          response_hash
         end
       else
         response
@@ -133,21 +136,24 @@ module NFGClient
             'TipAmount' => response.elements['TotalAddFee'].get_text.to_s
           }
         else
-          {
+          response_hash = {
             'StatusCode' => 'ValidationFailed',
             'Message' => response.elements['Message'].get_text.to_s,
-            'ErrorDetails' => {
-              'ErrorInfo' => {
-                'ErrCode' => response.elements['ErrorDetails'].andand.elements.andand['ErrorInfo'].andand.elements.andand['ErrCode'].andand.get_text.andand.to_s,
-                'ErrData' => response.elements['ErrorDetails'].andand.elements.andand['ErrorInfo'].andand.elements.andand['ErrData'].andand.get_text.andand.to_s
-              }
-            },
             'CallDuration' => response.elements['CallDuration'].get_text.to_s,
             'TotalChargeAmount' => response.elements['TotalChargeAmount'].get_text.to_s,
             'TotalAddFee' => response.elements['TotalAddFee'].get_text.to_s,
             'TotalDeductFee' => response.elements['TotalChargeAmount'].get_text.to_s,
             'TipAmount' => response.elements['TotalAddFee'].get_text.to_s
           }
+          if response.elements['ErrorDetails']
+            response_hash['ErrorDetails'] = {}
+            if response.elements['ErrorDetails/ErrorInfo']
+              response_hash['ErrorInfo'] = {}
+              response_hash['ErrCode'] = response.elements['ErrorDetails/ErrorInfo/ErrCode'].get_text.to_s if response.elements['ErrorDetails/ErrorInfo/ErrCode']
+              response_hash['ErrCode'] = response.elements['ErrorDetails/ErrorInfo/ErrCode'].get_text.to_s if response.elements['ErrorDetails/ErrorInfo/ErrCode']
+            end
+          end
+          response_hash
         end
       else
         response
@@ -173,19 +179,22 @@ module NFGClient
             'COFId' => response.elements['CofId'].get_text.to_s
           }
         else
-          {
+          response_hash = {
             'StatusCode' => response.elements['StatusCode'].get_text.to_s,
             'Message' => response.elements['Message'].get_text.to_s,
-            'ErrorDetails' => {
-              'ErrorInfo' => {
-                'ErrCode' => response.elements['ErrorDetails'].andand.elements.andand['ErrorInfo'].andand.elements.andand['ErrCode'].andand.get_text.andand.to_s,
-                'ErrData' => response.elements['ErrorDetails'].andand.elements.andand['ErrorInfo'].andand.elements.andand['ErrData'].andand.get_text.andand.to_s
-              }
-            },
             'CallDuration' => response.elements['CallDuration'].get_text.to_s,
             'ChargeId' => response.elements['ChargeId'].get_text.to_s,
             'COFId' => response.elements['CofId'].get_text.to_s
           }
+          if response.elements['ErrorDetails']
+            response_hash['ErrorDetails'] = {}
+            if response.elements['ErrorDetails/ErrorInfo']
+              response_hash['ErrorInfo'] = {}
+              response_hash['ErrCode'] = response.elements['ErrorDetails/ErrorInfo/ErrCode'].get_text.to_s if response.elements['ErrorDetails/ErrorInfo/ErrCode']
+              response_hash['ErrCode'] = response.elements['ErrorDetails/ErrorInfo/ErrCode'].get_text.to_s if response.elements['ErrorDetails/ErrorInfo/ErrCode']
+            end
+          end
+          response_hash
         end
       else
         response
@@ -211,19 +220,22 @@ module NFGClient
             'COFId' => response.elements['CofId'].get_text.to_s
           }
         else
-          {
+          response_hash = {
             'StatusCode' => response.elements['StatusCode'].get_text.to_s,
             'Message' => response.elements['Message'].get_text.to_s,
-            'ErrorDetails' => {
-              'ErrorInfo' => {
-                'ErrCode' => response.elements['ErrorDetails'].andand.elements.andand['ErrorInfo'].andand.elements.andand['ErrCode'].andand.get_text.andand.to_s,
-                'ErrData' => response.elements['ErrorDetails'].andand.elements.andand['ErrorInfo'].andand.elements.andand['ErrData'].andand.get_text.andand.to_s
-              }
-            },
             'CallDuration' => response.elements['CallDuration'].get_text.to_s,
             'ChargeId' => response.elements['ChargeId'].get_text.to_s,
             'COFId' => response.elements['CofId'].get_text.to_s
           }
+          if response.elements['ErrorDetails']
+            response_hash['ErrorDetails'] = {}
+            if response.elements['ErrorDetails/ErrorInfo']
+              response_hash['ErrorInfo'] = {}
+              response_hash['ErrCode'] = response.elements['ErrorDetails/ErrorInfo/ErrCode'].get_text.to_s if response.elements['ErrorDetails/ErrorInfo/ErrCode']
+              response_hash['ErrCode'] = response.elements['ErrorDetails/ErrorInfo/ErrCode'].get_text.to_s if response.elements['ErrorDetails/ErrorInfo/ErrCode']
+            end
+          end
+          response_hash
         end
       else
         response
@@ -249,19 +261,22 @@ module NFGClient
             'COFId' => response.elements['CofId'].get_text.to_s
           }
         else
-          {
+          response_hash = {
             'StatusCode' => response.elements['StatusCode'].get_text.to_s,
             'Message' => response.elements['Message'].get_text.to_s,
-            'ErrorDetails' => {
-              'ErrorInfo' => {
-                'ErrCode' => response.elements['ErrorDetails'].andand.elements.andand['ErrorInfo'].andand.elements.andand['ErrCode'].andand.get_text.andand.to_s,
-                'ErrData' => response.elements['ErrorDetails'].andand.elements.andand['ErrorInfo'].andand.elements.andand['ErrData'].andand.get_text.andand.to_s
-              }
-            },
             'CallDuration' => response.elements['CallDuration'].get_text.to_s,
             'ChargeId' => response.elements['ChargeId'].get_text.to_s,
             'COFId' => response.elements['CofId'].get_text.to_s
           }
+          if response.elements['ErrorDetails']
+            response_hash['ErrorDetails'] = {}
+            if response.elements['ErrorDetails/ErrorInfo']
+              response_hash['ErrorInfo'] = {}
+              response_hash['ErrCode'] = response.elements['ErrorDetails/ErrorInfo/ErrCode'].get_text.to_s if response.elements['ErrorDetails/ErrorInfo/ErrCode']
+              response_hash['ErrCode'] = response.elements['ErrorDetails/ErrorInfo/ErrCode'].get_text.to_s if response.elements['ErrorDetails/ErrorInfo/ErrCode']
+            end
+          end
+          response_hash
         end
       else
         response
