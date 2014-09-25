@@ -1,25 +1,25 @@
 module NFGClient
-  class CreditCardClient < Base
-    @@nfg_urls = {
-      'sandbox' => {
-        'host' => 'api-sandbox.networkforgood.org',
-        'url' => 'https://api-sandbox.networkforgood.org/PartnerDonationService/DonationServices.asmx',
-        'wsdl' => 'https://api-sandbox.networkforgood.org/PartnerDonationService/DonationServices.asmx?wsdl'
-      },
-      'production' => {
-        'host' => 'api.networkforgood.org',
-        'url' => 'https://api.networkforgood.org/PartnerDonationService/DonationServices.asmx',
-        'wsdl' => 'https://api.networkforgood.org/PartnerDonationService/DonationServices.asmx?wsdl'
+  class CreditCardClient < BaseClient
+    def initialize(partner_id, partner_password, partner_source, partner_campaign, use_sandbox = true)
+      super({
+        partner_id: partner_id,
+        partner_password: partner_password,
+        partner_source: partner_source,
+        partner_campaign: partner_campaign,
+        use_sandbox: use_sandbox
+      })
+      @nfg_urls = {
+        'sandbox' => {
+          'host' => 'api-sandbox.networkforgood.org',
+          'url' => 'https://api-sandbox.networkforgood.org/PartnerDonationService/DonationServices.asmx',
+          'wsdl' => 'https://api-sandbox.networkforgood.org/PartnerDonationService/DonationServices.asmx?wsdl'
+        },
+        'production' => {
+          'host' => 'api.networkforgood.org',
+          'url' => 'https://api.networkforgood.org/PartnerDonationService/DonationServices.asmx',
+          'wsdl' => 'https://api.networkforgood.org/PartnerDonationService/DonationServices.asmx?wsdl'
+        }
       }
-    }
-    include NFGClient::Utils
-
-    def initialize(partner_id, partner_password, partner_source, partner_campaign, use_sandbox)
-      @partner_id = partner_id
-      @partner_password = partner_password
-      @partner_source = partner_source
-      @partner_campaign = partner_campaign
-      @use_sandbox = use_sandbox
     end
 
     # Creates a card on file for the given donor token

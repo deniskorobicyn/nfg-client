@@ -1,25 +1,25 @@
 module NFGClient
-  class PaypalClient < Base
-  	@@nfg_urls = {
-      'sandbox' => {
-        'host' => 'api-sandbox.networkforgood.org',
-        'url' => 'https://api-sandbox.networkforgood.org/PartnerDonationService/PayPal.asmx',
-        'wsdl' => 'https://api-sandbox.networkforgood.org/PartnerDonationService/PayPal.asmx?wsdl'
-      },
-      'production' => {
-        'host' => 'api.networkforgood.org',
-        'url' => 'https://api.networkforgood.org/PartnerDonationService/PayPal.asmx',
-        'wsdl' => 'https://api.networkforgood.org/PartnerDonationService/PayPal.asmx?wsdl'
+  class PaypalClient < BaseClient
+    def initialize(partner_id, partner_password, partner_source, partner_campaign, use_sandbox = true)
+      super({
+        partner_id: partner_id,
+        partner_password: partner_password,
+        partner_source: partner_source,
+        partner_campaign: partner_campaign,
+        use_sandbox: use_sandbox
+      })
+      @nfg_urls = {
+        'sandbox' => {
+          'host' => 'api-sandbox.networkforgood.org',
+          'url' => 'https://api-sandbox.networkforgood.org/PartnerDonationService/PayPal.asmx',
+          'wsdl' => 'https://api-sandbox.networkforgood.org/PartnerDonationService/PayPal.asmx?wsdl'
+        },
+        'production' => {
+          'host' => 'api.networkforgood.org',
+          'url' => 'https://api.networkforgood.org/PartnerDonationService/PayPal.asmx',
+          'wsdl' => 'https://api.networkforgood.org/PartnerDonationService/PayPal.asmx?wsdl'
+        }
       }
-    }
-    include NFGClient::Utils
-
-    def initialize(partner_id, partner_password, partner_source, partner_campaign, use_sandbox)
-      @partner_id = partner_id
-      @partner_password = partner_password
-      @partner_source = partner_source
-      @partner_campaign = partner_campaign
-      @use_sandbox = use_sandbox
     end
 
     # Initialize PayPal Checkout
@@ -29,16 +29,16 @@ module NFGClient
     def initialize_paypal_checkout(params)
       requires!(params, :DonationLineItems, :DonorIpAddress, :DonorToken, :DisplayName, :TipAmount, :ReturnURL, :CancelURL)
       call_params = add_credentials_to_params(params)
-      response = nfg_soap_request('InitializePaypalCheckout', call_params)
+      response = nfg_soap_request('InitializePayPalCheckout', call_params)
       if response.is_a? REXML::Element
-        if (response.elements['StatusCode'].get_text.to_s == 'Success') || ((response.elements['StatusCode'].get_text.to_s != 'Success') && response.elements['ErrorDetails'].elements['ErrorInfo'].nil?)
+        if (response.elements['StatusCode'].get_text.to_s == 'Success')
           {
             'StatusCode' => response.elements['StatusCode'].get_text.to_s,
             'Message' => response.elements['Message'].get_text.to_s,
             'ErrorDetails' => response.elements['ErrorDetails'].get_text.to_s,
             'CallDuration' => response.elements['CallDuration'].get_text.to_s,
-            'RedirectURL' => rsponse.elements['RedirectURL'].get_text.to_s,
-            'PPToken' => rsponse.elements['PPToken'].get_text.to_s,
+            'RedirectURL' => response.elements['RedirectURL'].get_text.to_s,
+            'PPToken' => response.elements['PPToken'].get_text.to_s,
           }
         else
           {
@@ -67,7 +67,7 @@ module NFGClient
       call_params = add_credentials_to_params(params)
       response = nfg_soap_request('CompletePayPalCheckout', call_params)
       if response.is_a? REXML::Element
-        if (response.elements['StatusCode'].get_text.to_s == 'Success') || ((response.elements['StatusCode'].get_text.to_s != 'Success') && response.elements['ErrorDetails'].elements['ErrorInfo'].nil?)
+        if (response.elements['StatusCode'].get_text.to_s == 'Success')
           {
             'StatusCode' => response.elements['StatusCode'].get_text.to_s,
             'Message' => response.elements['Message'].get_text.to_s,
@@ -112,7 +112,7 @@ module NFGClient
       call_params = add_credentials_to_params(params)
       response = nfg_soap_request('GetPayPalCheckoutDetails', call_params)
       if response.is_a? REXML::Element
-        if (response.elements['StatusCode'].get_text.to_s == 'Success') || ((response.elements['StatusCode'].get_text.to_s != 'Success') && response.elements['ErrorDetails'].elements['ErrorInfo'].nil?)
+        if (response.elements['StatusCode'].get_text.to_s == 'Success')
           {
             'StatusCode' => response.elements['StatusCode'].get_text.to_s,
             'Message' => response.elements['Message'].get_text.to_s,

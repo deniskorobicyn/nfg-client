@@ -2,7 +2,48 @@ require 'net/http'
 require 'rexml/document'
 
 module NFGClient
-  module Utils
+  class BaseClient
+
+    attr_accessor :partner_id, :partner_password, :partner_source, :partner_campaign, :use_sandbox
+
+    def initialize(attributes = {})
+      attributes.each do |name, value|
+        send("#{name}=", value)
+      end
+    end
+
+    # Adds client credentials to hash of parameters
+    #
+    # Arguments:
+    #   params: (Hash)
+    def add_credentials_to_params(params)
+      return params unless params.is_a? Hash
+      credentials = {
+        'PartnerID' => @partner_id,
+        'PartnerPW' => @partner_password,
+        'PartnerSource' => @partner_source,
+        'PartnerCampaign' => @partner_campaign
+      }
+      credentials.merge(params)
+    end
+
+    # Raises an exception if the required params are not part of the given hash
+    #
+    # Arguments:
+    #   hash: (Hash)
+    #   *params: (Array or Symbol)
+    def requires!(hash, *params)
+      params.each do |param|
+        if param.is_a?(Array)
+          raise ArgumentError.new("Missing required parameter: #{param.first}") unless hash.has_key?(param.first) || hash.has_key?(param.first.to_s)
+
+          valid_options = param[1..-1]
+          raise ArgumentError.new("Parameter: #{param.first} must be one of #{valid_options.to_sentence(:words_connector => 'or')}") unless valid_options.include?(hash[param.first]) || valid_options.include?(hash[param.first.to_s])
+        else
+          raise ArgumentError.new("Missing required parameter: #{param}") unless hash.has_key?(param) || hash.has_key?(param.to_s)
+        end
+      end
+    end
 
     # Makes HTTP POST request to NFG server (sandbox or production) and returns parsed XML response.
     #
@@ -33,6 +74,8 @@ module NFGClient
         raise ArgumentError.new('http_post requires a nfg_method and a hash of params')
       end
     end
+
+    private
 
     # Returns a complete NFG SOAP request based on the provided target method and params
     def build_nfg_soap_request(nfg_method, params)
@@ -99,14 +142,14 @@ module NFGClient
 
     # Returns NFG target host
     def host
-      return @@nfg_urls['sandbox']['host'] if @use_sandbox
-      @@nfg_urls['production']['host']
+      return @nfg_urls['sandbox']['host'] if @use_sandbox
+      @nfg_urls['production']['host']
     end
 
     # Returns NFG target URL
     def url
-      return @@nfg_urls['sandbox']['url'] if @use_sandbox
-      @@nfg_urls['production']['url']
+      return @nfg_urls['sandbox']['url'] if @use_sandbox
+      @nfg_urls['production']['url']
     end
 
     # Returns a string containing an XML representation of the given hash
@@ -122,22 +165,5 @@ module NFGClient
       end.join
     end
 
-    # Raises an exception if the required params are not part of the given hash
-    #
-    # Arguments:
-    #   hash: (Hash)
-    #   *params: (Array or Symbol)
-    def requires!(hash, *params)
-      params.each do |param|
-        if param.is_a?(Array)
-          raise ArgumentError.new("Missing required parameter: #{param.first}") unless hash.has_key?(param.first) || hash.has_key?(param.first.to_s)
-
-          valid_options = param[1..-1]
-          raise ArgumentError.new("Parameter: #{param.first} must be one of #{valid_options.to_sentence(:words_connector => 'or')}") unless valid_options.include?(hash[param.first]) || valid_options.include?(hash[param.first.to_s])
-        else
-          raise ArgumentError.new("Missing required parameter: #{param}") unless hash.has_key?(param) || hash.has_key?(param.to_s)
-        end
-      end
-    end
   end
 end
