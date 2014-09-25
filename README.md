@@ -16,7 +16,7 @@ Or add it to your Gemfile:
 
 Create a NFG Client instance using your NFG credentials:
 
-    nfg_client = NFGClient.new(partner_id, partner_password, partner_source, partner_campaign, use_sandbox)
+    nfg_client = NFGClient::CreditCardClient.new(partner_id, partner_password, partner_source, partner_campaign, use_sandbox)
 
 The fifth parameter is optional (defaults to false), and indicates the Client which API URLs to use (sandbox or production).
 
@@ -35,6 +35,8 @@ http://www.thenetworkforgood.org/t5/Developer-Resource-Center/ct-p/Developer
 ## Supported Calls
 
 Below, the list of supported calls and examples of usage. All functions return a hash with the response from NFG.
+
+TODO Add here NFG PayPal API call's examples
 
 ### CreateCOF
 

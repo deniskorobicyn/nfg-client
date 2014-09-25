@@ -3,18 +3,6 @@ require 'rexml/document'
 
 module NFGClient
   module Utils
-    @@nfg_urls = {
-      'sandbox' => {
-        'host' => 'api-sandbox.networkforgood.org',
-        'url' => 'https://api-sandbox.networkforgood.org/PartnerDonationService/DonationServices.asmx',
-        'wsdl' => 'https://api-sandbox.networkforgood.org/PartnerDonationService/DonationServices.asmx?wsdl'
-      },
-      'production' => {
-        'host' => 'api.networkforgood.org',
-        'url' => 'https://api.networkforgood.org/PartnerDonationService/DonationServices.asmx',
-        'wsdl' => 'https://api.networkforgood.org/PartnerDonationService/DonationServices.asmx?wsdl'
-      }
-    }
 
     # Makes HTTP POST request to NFG server (sandbox or production) and returns parsed XML response.
     #

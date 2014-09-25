@@ -1,10 +1,17 @@
 module NFGClient
-
-  def self.new(partner_id, partner_password, partner_source, partner_campaign, use_sandbox = false)
-    NFGClient::Client.new(partner_id, partner_password, partner_source, partner_campaign, use_sandbox)
-  end
-
-  class Client
+  class CreditCardClient
+    @@nfg_urls = {
+      'sandbox' => {
+        'host' => 'api-sandbox.networkforgood.org',
+        'url' => 'https://api-sandbox.networkforgood.org/PartnerDonationService/DonationServices.asmx',
+        'wsdl' => 'https://api-sandbox.networkforgood.org/PartnerDonationService/DonationServices.asmx?wsdl'
+      },
+      'production' => {
+        'host' => 'api.networkforgood.org',
+        'url' => 'https://api.networkforgood.org/PartnerDonationService/DonationServices.asmx',
+        'wsdl' => 'https://api.networkforgood.org/PartnerDonationService/DonationServices.asmx?wsdl'
+      }
+    }
     include NFGClient::Utils
 
     def initialize(partner_id, partner_password, partner_source, partner_campaign, use_sandbox)
@@ -347,153 +354,6 @@ module NFGClient
       else
         response
       end
-    end
-
-    # TODO make base class for all parts: Credit Card API, Batch Disbursement API and PayPal API
-    # TODO make it as other part, like nfg-paypal-client
-    # TODO make all symbols snake_case and translate it only in URL request
-    # TODO add tests about it and make_donations
-
-    # Initialize PayPal Checkout
-    #
-    # Arguments:
-    #   params: (Hash)
-    def initialize_paypal_checkout(params)
-      requires!(params, :DonationLineItems, :DonorIpAddress, :DonorToken, :DisplayName, :TipAmount, :ReturnURL, :CancelURL)
-      call_params = add_credentials_to_params(params)
-      response = nfg_soap_request('InitializePaypalCheckout', call_params)
-      if response.is_a? REXML::Element
-        if (response.elements['StatusCode'].get_text.to_s == 'Success') || ((response.elements['StatusCode'].get_text.to_s != 'Success') && response.elements['ErrorDetails'].elements['ErrorInfo'].nil?)
-          {
-            'StatusCode' => response.elements['StatusCode'].get_text.to_s,
-            'Message' => response.elements['Message'].get_text.to_s,
-            'ErrorDetails' => response.elements['ErrorDetails'].get_text.to_s,
-            'CallDuration' => response.elements['CallDuration'].get_text.to_s,
-            'RedirectURL' => rsponse.elements['RedirectURL'].get_text.to_s,
-            'PPToken' => rsponse.elements['PPToken'].get_text.to_s,
-          }
-        else
-          {
-            'StatusCode' => response.elements['StatusCode'].get_text.to_s,
-            'Message' => response.elements['Message'].get_text.to_s,
-            'ErrorDetails' => {
-              'ErrorInfo' => {
-                'ErrCode' => response.elements['ErrorDetails'].andand.elements.andand['ErrorInfo'].andand.elements.andand['ErrCode'].andand.get_text.andand.to_s,
-                'ErrData' => response.elements['ErrorDetails'].andand.elements.andand['ErrorInfo'].andand.elements.andand['ErrData'].andand.get_text.andand.to_s
-              }
-            },
-            'CallDuration' => response.elements['CallDuration'].get_text.to_s,
-          }
-        end
-      else
-        response
-      end
-    end
-
-    # Complete PayPal Checkout
-    #
-    # Arguments:
-    #   params: (Hash)
-    def complete_paypal_checkout(params)
-      requires!(params, :PPToken)
-      call_params = add_credentials_to_params(params)
-      response = nfg_soap_request('CompletePayPalCheckout', call_params)
-      if response.is_a? REXML::Element
-        if (response.elements['StatusCode'].get_text.to_s == 'Success') || ((response.elements['StatusCode'].get_text.to_s != 'Success') && response.elements['ErrorDetails'].elements['ErrorInfo'].nil?)
-          {
-            'StatusCode' => response.elements['StatusCode'].get_text.to_s,
-            'Message' => response.elements['Message'].get_text.to_s,
-            'ErrorDetails' => response.elements['ErrorDetails'].get_text.to_s,
-            'CallDuration' => response.elements['CallDuration'].get_text.to_s,
-            'DonorEmail' => response.elements['DonorEmail'].get_text.to_s,
-            'DonorFirstName' => response.elements['DonorFirstName'].get_text.to_s,
-            'DonorLastName' => response.elements['DonorLastName'].get_text.to_s,
-            'DonorAddress1' => response.elements['DonorAddress1'].get_text.to_s,
-            'DonorAddress2' => response.elements['DonorAddress2'].get_text.to_s,
-            'DonorCity' => response.elements['DonorCity'].get_text.to_s,
-            'DonorState' => response.elements['DonorState'].get_text.to_s,
-            'DonorZip' => response.elements['DonorZip'].get_text.to_s,
-            'DonorCountry' => response.elements['DonorCountry'].get_text.to_s,
-            'DonorPhone' => response.elements['DonorPhone'].get_text.to_s,
-            'ChargeId' => response.elements['ChargeId'].get_text.to_s
-          }
-        else
-          {
-            'StatusCode' => response.elements['StatusCode'].get_text.to_s,
-            'Message' => response.elements['Message'].get_text.to_s,
-            'ErrorDetails' => {
-              'ErrorInfo' => {
-                'ErrCode' => response.elements['ErrorDetails'].andand.elements.andand['ErrorInfo'].andand.elements.andand['ErrCode'].andand.get_text.andand.to_s,
-                'ErrData' => response.elements['ErrorDetails'].andand.elements.andand['ErrorInfo'].andand.elements.andand['ErrData'].andand.get_text.andand.to_s
-              }
-            },
-            'CallDuration' => response.elements['CallDuration'].get_text.to_s,
-          }
-        end
-      else
-        response
-      end
-    end
-
-    # Get info about PayPal transaction
-    #
-    # Arguments:
-    #   params: (Hash)
-    def get_paypal_checkout_details(params)
-      requires!(params, :PPToken)
-      call_params = add_credentials_to_params(params)
-      response = nfg_soap_request('GetPayPalCheckoutDetails', call_params)
-      if response.is_a? REXML::Element
-        if (response.elements['StatusCode'].get_text.to_s == 'Success') || ((response.elements['StatusCode'].get_text.to_s != 'Success') && response.elements['ErrorDetails'].elements['ErrorInfo'].nil?)
-          {
-            'StatusCode' => response.elements['StatusCode'].get_text.to_s,
-            'Message' => response.elements['Message'].get_text.to_s,
-            'ErrorDetails' => response.elements['ErrorDetails'].get_text.to_s,
-            'CallDuration' => response.elements['CallDuration'].get_text.to_s,
-            'DonorEmail' => response.elements['DonorEmail'].get_text.to_s,
-            'DonorFirstName' => response.elements['DonorFirstName'].get_text.to_s,
-            'DonorLastName' => response.elements['DonorLastName'].get_text.to_s,
-            'DonorAddress1' => response.elements['DonorAddress1'].get_text.to_s,
-            'DonorAddress2' => response.elements['DonorAddress2'].get_text.to_s,
-            'DonorCity' => response.elements['DonorCity'].get_text.to_s,
-            'DonorState' => response.elements['DonorState'].get_text.to_s,
-            'DonorZip' => response.elements['DonorZip'].get_text.to_s,
-            'DonorCountry' => response.elements['DonorCountry'].get_text.to_s,
-            'DonorPhone' => response.elements['DonorPhone'].get_text.to_s
-          }
-        else
-          {
-            'StatusCode' => response.elements['StatusCode'].get_text.to_s,
-            'Message' => response.elements['Message'].get_text.to_s,
-            'ErrorDetails' => {
-              'ErrorInfo' => {
-                'ErrCode' => response.elements['ErrorDetails'].andand.elements.andand['ErrorInfo'].andand.elements.andand['ErrCode'].andand.get_text.andand.to_s,
-                'ErrData' => response.elements['ErrorDetails'].andand.elements.andand['ErrorInfo'].andand.elements.andand['ErrData'].andand.get_text.andand.to_s
-              }
-            },
-            'CallDuration' => response.elements['CallDuration'].get_text.to_s,
-          }
-        end
-      else
-        response
-      end
-    end
-
-    private
-
-    # Adds client credentials to hash of parameters
-    #
-    # Arguments:
-    #   params: (Hash)
-    def add_credentials_to_params(params)
-      return params unless params.is_a? Hash
-      credentials = {
-        'PartnerID' => @partner_id,
-        'PartnerPW' => @partner_password,
-        'PartnerSource' => @partner_source,
-        'PartnerCampaign' => @partner_campaign
-      }
-      credentials.merge(params)
     end
   end
 end
